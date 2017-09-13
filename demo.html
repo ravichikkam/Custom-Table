@@ -2,6 +2,7 @@
   <meta charset="utf-8"> <!-- also save this file as unicode-8 ! -->
   <head>
     <script src="http://d3js.org/d3.v4.js"></script>
+    
     <style>
         body {
             text-align: center
@@ -27,13 +28,25 @@
             border-color: inherit;
             
         }
-        th, td {
+        td {
               padding: 0.18rem;
+              text-align: left;
+              border: 1px solid #ccc;
+            }
+        th {
+              padding: 0.25rem;
               text-align: left;
               border: 1px solid #ccc;
             }
         tbody tr:hover {
               background: #e8ebef;
+            }
+        th.des:after {
+              content: "\21E9";
+            }
+
+            th.aes:after {
+              content: "\21E7";
             }
 
       </style>
@@ -47,104 +60,120 @@
     <script>
         d3.csv("critviz-crit-data-demo.csv", function(error, data) {
             if(error) throw error;
+            
+            var sortAscending = true;    
             data.forEach(function(d) {
                 d.Average = +d.Average;
                 d.Disagreement = +d.Disagreement;
                 d.Wins = +d.Wins;
             })
-        function tabulate(data, columns) {
-		var table = d3.select('body').append('table')
-		var thead = table.append('thead')
-		var	tbody = table.append('tbody');
+            function tabulate(data, columns) {
+            var table = d3.select('body').append('table').attr("id", "tableid")
+            var thead = table.append('thead')
+            var	tbody = table.append('tbody');
 
-       
-		thead.append('tr')
-		  .selectAll('th')
-		  .data(columns).enter()
-		  .append('th')
-		    .text(function (column) { return column; })
-            .style("width", function(column) {
-                if(column == "Average" || column == "Disagreement" || column == "Wins" || column == "Avg/Wins") {return "100px"};
-        });
 
-		var rows = tbody.selectAll('tr')
-		  .data(data)
-		  .enter()
-		  .append('tr');
+            thead.append('tr')
+              .selectAll('th')
+              .data(columns).enter()
+              .append('th')
+                .attr("id", "colname")
+                .text(function (column) { return column; })
+                .style("width", function(column) {
+                    if(column == "Average" || column == "Disagreement" || column == "Wins" || column == "Avg/Wins") {return "100px"};
+                })
+                .on("click", function(d) {
+                    d3.selectAll("#colname")
+                        .attr('class', 'header');
+		                	   
+		                	   if (sortAscending) {
+		                	     rows.sort(function(a, b) { return d3.ascending(b[d], a[d]);});
+		                	     sortAscending = false;
+		                	     this.className = 'aes';
+		                	   } else {
+		                		 rows.sort(function(a, b) { return d3.descending(b[d], a[d]); });
+		                		 sortAscending = true;
+		                		 this.className = 'des';
+		                	   }
+                });
 
-		var cells = rows.selectAll('td')
-		  .data(function (row) {
-		    return columns.map(function (column) {
-		      return {column: column, value: row[column]};
-		    });
-		  })
-		  .enter()
-		  .append('td')
-            .attr("class", function(d) {
-                if(d.column == "Average" || d.column == "Disagreement" || d.column == "Wins" || d.column == "Avg/Wins") {
-                    return "valuestyle";
-                }
-            })
-		    .text(function (d) { 
-                    if(d.column != "Average" && d.column != "Disagreement" && d.column != "Wins" && d.column != "Avg/Wins") {
-                            return d.value; }
-                            })
-            .style("background-color", function(d) {
-                if(d.column == "p1" || d.column == "p2" || d.column == "p3" ||d.column == "p4" || d.column == "p5") {
-                    if(d.value == 1) { return "#42f462"} 
-                    else if(d.value == 5) { return "#f44141"}
-                    else if(d.value == 2) { return "#91f441"}
-                    else if(d.value == 3) { return "#e2f441"}
-                    else if(d.value == 4) { return "#f49441"}
-                }
-            })
-            .style("font-weight", function(d) {
-                if(d.column == "First Name") {
-                    return "bold";
-                }
-            });
-            
-            
-        var x1 = d3.scaleLinear()
-                    .domain([0, 5])
-                    .range([0, 100]);
-        var x2 = d3.scaleLinear()
-                    .domain([0, 5])
-                    .range([0, 100]);
-        var x3 = d3.scaleLinear()
-                    .domain([0, 20])
-                    .range([0, 100]);
-        var x4 = d3.scaleLinear()
-                    .domain([0 ,20])
-                    .range([0, 100]);
-            
-        d3.selectAll(".valuestyle")
-            .append("svg")
-            .attr("id", "chart")
-            .attr("width", "100px")
-            .attr("height", "20px")
-                .append("rect")
-                .attr("x", 0)
-                .attr("y", 0)
-                .attr("width", function(d) {
-                                    if(d.column == "Average") {return x1(d.value);}
-                                    if(d.column == "Disagreement") {return x2(d.value);}
-                                    if(d.column == "Wins") {return x3(d.value);}
-                                    if(d.column == "Avg/Wins") {return x4(d.value);}
-                                })
-                .attr("height", 19)
-                .style("fill", "dimgrey");
-        
-            d3.selectAll("#chart")
-                .append("text")
-                    .text(function(d) { return d.value; })
-                    .attr("x", 0)
-                    .attr("y", 15)
-                    .style("text-color", "#eaecef")
-                    .style("text-align", "left")
-                    .style("opacity", 0.4)
-                    .style("font-size", "90%");
+            var rows = tbody.selectAll('tr')
+              .data(data)
+              .enter()
+              .append('tr');
                 
+            var cells = rows.selectAll('td')
+              .data(function (row) {
+                return columns.map(function (column) {
+                  return {column: column, value: row[column]};
+                });
+              })
+              .enter()
+              .append('td')
+                .attr("class", function(d) {
+                    if(d.column == "Average" || d.column == "Disagreement" || d.column == "Wins" || d.column == "Avg/Wins") {
+                        return "valuestyle";
+                    }
+                })
+                .text(function (d) { 
+                        if(d.column != "Average" && d.column != "Disagreement" && d.column != "Wins" && d.column != "Avg/Wins") {
+                                return d.value; }
+                                })
+                .style("background-color", function(d) {
+                    if(d.column == "p1" || d.column == "p2" || d.column == "p3" ||d.column == "p4" || d.column == "p5") {
+                        if(d.value == 1) { return "#42f462"} 
+                        else if(d.value == 5) { return "#f44141"}
+                        else if(d.value == 2) { return "#91f441"}
+                        else if(d.value == 3) { return "#e2f441"}
+                        else if(d.value == 4) { return "#f49441"}
+                    }
+                })
+                .style("font-weight", function(d) {
+                    if(d.column == "First Name") {
+                        return "bold";
+                    }
+                });
+
+
+            var x1 = d3.scaleLinear()
+                        .domain([0, 5])
+                        .range([0, 100]);
+            var x2 = d3.scaleLinear()
+                        .domain([0, 5])
+                        .range([0, 100]);
+            var x3 = d3.scaleLinear()
+                        .domain([0, 20])
+                        .range([0, 100]);
+            var x4 = d3.scaleLinear()
+                        .domain([0 ,20])
+                        .range([0, 100]);
+
+            d3.selectAll(".valuestyle")
+                .append("svg")
+                .attr("id", "chart")
+                .attr("width", "100px")
+                .attr("height", "20px")
+                    .append("rect")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", function(d) {
+                                        if(d.column == "Average") {return x1(d.value);}
+                                        if(d.column == "Disagreement") {return x2(d.value);}
+                                        if(d.column == "Wins") {return x3(d.value);}
+                                        if(d.column == "Avg/Wins") {return x4(d.value);}
+                                    })
+                    .attr("height", 19)
+                    .style("fill", "dimgrey");
+
+                d3.selectAll("#chart")
+                    .append("text")
+                        .text(function(d) { return d.value; })
+                        .attr("x", 0)
+                        .attr("y", 15)
+                        .style("text-color", "#eaecef")
+                        .style("text-align", "left")
+                        .style("opacity", 0.4)
+                        .style("font-size", "90%");
 
 	   return table;
         }
@@ -152,5 +181,12 @@
             
         })
     </script>
+<!--
+    <script type="text/javascript">
+        $(function(){
+          $('#tableid').tablesorter(); 
+        });
+    </script>
+-->
   </body>
 </html>  
