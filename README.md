@@ -1,3 +1,5 @@
-# My-D3.js-work
+# Readme.md
 
-This is a demo to create a HTML table right from the scratch using HTML5, CSS, SVG, D3.js V4.
+This is a work in progress to create a custom table that would effectively showcase the in class peer reviews.
+
+This is being built by using HTML5, CSS, D3.js and SVG.
