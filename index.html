@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <meta charset="utf-8"> <!-- also save this file as unicode-8 ! -->
+    <head>
+    <script src = "https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="http://d3js.org/d3.v4.js"></script>
+    <script type="text/javascript" src="demojs.js"></script>
+    <style>
+        body {
+            text-align: center
+                
+        }
+        table {
+            display: table;
+            border-collapse: collapse;
+            border-spacing: 2px;
+            border-color: gray;
+            table-layout: fixed;
+        }
+        thead {
+            display: table-header-group;
+            vertical-align: middle;
+            border-color: inherit;
+            background-color: darkgrey;
+            color: white;
+        }
+        tbody {
+            display: table-row-group;
+            vertical-align: middle;
+            border-color: inherit;
+            
+        }
+        td {
+              padding: 0.18rem;
+              text-align: left;
+              border: 1px solid #ccc;
+            }
+        th {
+              padding: 0.25rem;
+              text-align: left;
+              border: 1px solid #ccc;
+            }
+        tbody tr:hover {
+              background: #e8ebef;
+            }
+        th.des:after {
+              content: "\21E9";
+            }
+
+            th.aes:after {
+              content: "\21E7";
+            }
+
+      </style>
+    </head>
+    <body>
+        <h1>Data Table</h1>
+    </body>
+</html>  
